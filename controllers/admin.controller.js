@@ -112,13 +112,13 @@ exports.deleteCarousel = asyncHanlder(async (req, res) => {
 })
 
 exports.addProject = asyncHanlder(async (req, res) => {
-    projectUpload(req, res, async (err) => {
+    projectUpload(req, res, async err => {
         if (err) {
-            console.log(err);
+            console.log(err)
             return res.status(400).json({ message: "Multer Error" })
         }
         if (
-            !req.files["hero"] ||
+            !req.files.hero ||
             !req.files["screenshots-web-main"] ||
             !req.files["screenshots-web-other"] ||
             !req.files["screenshots-mobile-main"] ||
@@ -128,70 +128,91 @@ exports.addProject = asyncHanlder(async (req, res) => {
         ) {
             return res.status(400).json({ message: "All Images Required" })
         }
-        let images = {}
+
+        const images = {}
         for (const key in req.files) {
-            if (key === "screenshots-Web-other" || key === "screenshots-Mobile-other") {
+            if (key === "screenshots-web-other" || key === "screenshots-mobile-other") {
                 if (!images[key]) {
                     images[key] = []
                 }
-                const uploadALLImages = []
+                const uploadAllImagesPrmises = []
                 for (const item of req.files[key]) {
-                    uploadALLImages.push(cloudinary.uploader.upload(item.path))
+                    uploadAllImagesPrmises.push(cloudinary.uploader.upload(item.path))
                 }
-                const allData = await Promise.all(uploadALLImages)
+                const allData = await Promise.all(uploadAllImagesPrmises)
                 images[key] = allData.map(item => item.secure_url)
+
+                // req.files[key].forEach(async item => {
+                //     const { secure_url } = await cloudinary.uploader.upload(item.path)
+                //     images[key] = [...images[key], secure_url]
+                // })
+                // const uploadAllImagesPrmises = req.files[key].forEach(item => {
+                //     return cloudinary.uploader.upload(item.path, { async: true })
+                // })
+                // console.log(uploadAllImagesPrmises)
+
+                // const allData = await Promise.all(uploadAllImagesPrmises)
+                // images[key] = allData.map(item => item.secure_url)
             } else {
                 const { secure_url } = await cloudinary.uploader.upload(req.files[key][0].path)
                 images[key] = secure_url
             }
         }
+
+        // console.log("-*--------- body -----------");
+        console.log(req.body)
+        // console.log("-*--------- body -----------");
+        console.log(images)
         await Projects.create({
             title: req.body.title,
-            shortdesc: req.body.shortdesc,
+            shortDesc: req.body.shortDesc,
             desc: req.body.desc,
             duration: req.body.duration,
             learning: req.body.learning,
-            images: images.images,
             live: req.body.live,
             source: req.body.source,
             isMobileApp: req.body.isMobileApp,
+            hero: images["hero"],
             technologies: {
-                frontend: req.body.FrontEnd,
-                backend: req.body.BackEnd,
-                mobile: req.body.Mobile,
-                collabration: req.body.Collabration,
-                hoisting: req.body.Hoisting,
+                frontend: req.body.frontend,
+                backend: req.body.backend,
+                mobile: req.body.mobile,
+                hosting: req.body.hosting,
+                collaboration: req.body.collaboration,
             },
             sections: {
                 web: [
                     {
                         title: req.body["sections-web-title"],
                         desc: req.body["sections-web-desc"],
-                        images: images["sections-web-images"],
+                        hero: images["sections-web-hero"]
                     }
                 ],
                 mobile: [
                     {
                         title: req.body["sections-mobile-title"],
                         desc: req.body["sections-mobile-desc"],
-                        images: images["sections-mobile-images"],
+                        hero: images["sections-mobile-hero"]
                     }
                 ],
             },
             screenshots: {
                 web: {
-                    main: images["screenshots-Web-main"],
-                    other: images["screenshots-Web-other"]
+                    main: images["screenshots-web-main"],
+                    other: images["screenshots-web-other"]
                 },
                 mobile: {
-                    main: images["screenshots-Mobile-main"],
-                    other: images["screenshots-Mobile-other"]
-                }
-            },
+                    main: images["screenshots-mobile-main"],
+                    other: images["screenshots-mobile-other"]
+                },
+            }
         })
-        res.json({ message: "Project Add Success...!" })
+        res.json({ message: "Project Create Success" })
     })
+
+
 })
+
 
 
 
