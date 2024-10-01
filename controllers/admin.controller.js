@@ -79,9 +79,10 @@ exports.addCarousel = asyncHanlder(async (req, res) => {
 
 
 })
+
 exports.getCarousel = asyncHanlder(async (req, res) => {
     const result = await Carousel.find()
-    res.json({ message: "Carousel Fetch Success", result })
+    res.status(200).json({ message: "Carousel Fetch Success", result })
 })
 exports.updateCarousel = asyncHanlder(async (req, res) => {
     upload(req, res, async err => {
