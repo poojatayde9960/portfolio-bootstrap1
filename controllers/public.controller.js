@@ -34,6 +34,16 @@ exports.addEnquiry = asyncHanlder(async (req, res) => {
     if (!validator.isMobilePhone(number, "en-IN")) {
         return res.status(400).json({ message: "Invalid number" })
     }
+    sendEmail({
+        to: "poojatayde607@gmail.com",
+        message: `company${company},email${email},mobile${mobile}message${message}`,
+        subject: `new Enquery from ${company}`
+    })
+    sendEmail({
+        to: email,
+        message: `thanku for enquery. i will get in touch with toy son`,
+        subject: `thanku for your intrest`
+    })
     await Enquery.create({ name, email, number, message, company })
     res.json({ message: "Enquery Message Added Success...!", })
 })
