@@ -21,20 +21,20 @@ exports.getProjectDetails = asyncHanlder(async (req, res) => {
 
 // Enquery
 exports.addEnquiry = asyncHanlder(async (req, res) => {
-    const { name, email, mobile, message, company } = req.body
+    const { name, email, number, message, company } = req.body
     console.log(req.body);
 
-    const { isError, error } = checkEmpty({ name, email, mobile, message, company })
+    const { isError, error } = checkEmpty({ name, email, number, message, company })
     if (isError) {
         return res.status(400).json({ message: "All Fields Required", error })
     }
     if (!validator.isEmail(email)) {
         return res.status(400).json({ message: "Invalid Email" })
     }
-    if (!validator.isMobilePhone(mobile, "en-IN")) {
-        return res.status(400).json({ message: "Invalid Mobile" })
+    if (!validator.isMobilePhone(number, "en-IN")) {
+        return res.status(400).json({ message: "Invalid number" })
     }
-    await Enquery.create({ name, email, mobile, message, company })
+    await Enquery.create({ name, email, number, message, company })
     res.json({ message: "Enquery Message Added Success...!", })
 })
 

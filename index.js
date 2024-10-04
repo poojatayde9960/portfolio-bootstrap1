@@ -17,7 +17,6 @@ app.use(cors({
     origin: process.env.NODE_ENV === "development"
         ? "http://localhost:5173"
         : "https://portfolio-bootstrap1-1.onrender.com/",
-
     credentials: true
 }))
 
